@@ -42,8 +42,9 @@ const authenticate = async (req, res) => {
   }
 
   //Comprobar user El password
+  //Como se creo el methodo en el Modelo tenemos acceso a el desde aca
   if (await user.checkPassword(password)) {
-    // passwor => es que requerimos desde el body
+    // password => es que requerimos desde el body
     console.log("Correct");
     res.json({
       _id: user._id,
@@ -129,6 +130,12 @@ const newPassword = async (req, res) => {
   }
 };
 
+const profile = async (req, res) => {
+  const { user } = req;
+  res.json(user)
+
+};
+
 export {
   registerUser,
   authenticate,
@@ -136,4 +143,5 @@ export {
   forgotPassword,
   checkToken,
   newPassword,
+  profile,
 };

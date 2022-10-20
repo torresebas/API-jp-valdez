@@ -32,19 +32,21 @@ const userSchema = mongoose.Schema(
 
 // Se ejecuta antes de guardar en DB
 userSchema.pre("save", async function (next) {
-  //revisa que el password no sea cambiado
-  // el pre save hashea sobre el hash actual
+  //revisa que el password no haya sido cambiado
+  // el pre save hashea sobre el hash actual -> el usuario perderia el aceso
+  //si no se modifica el password lo deja quieto
   if (!this.isModified("password")) {
     next();
   }
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password, salt); // hace referencia al objeto ususario en userController
 });
 
 //Comprobar Password
-userSchema.methods.checkPassword = async function(passwordform){
-  return await bcrypt.compare(passwordform, this.password) // compara el que user escribe, contra el que existe hasheado
-}
+//Funcion para comprobar el password de manera custom
+userSchema.methods.checkPassword = async function (passwordform) { // password que viene desde el form
+  return await bcrypt.compare(passwordform, this.password); // compara el que user escribe, contra el que existe hasheado
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;

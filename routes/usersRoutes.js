@@ -6,8 +6,11 @@ import {
   confirm,
   forgotPassword,
   checkToken,
-  newPassword
+  newPassword,
+  profile
 } from "../controllers/userController.js";
+
+import checkAuth from "../middlewares/checkAuth.js";
 
 // Register - Auth - Confirm-User
 router.post("/", registerUser); //Create a new user
@@ -19,8 +22,9 @@ router.post("/forgot-password", forgotPassword);
 // router.get('/forgot-password/:token', checkToken)
 // router.post('/forgot-password/:token', newPassword)
 
-
 // FORM2 Cuando son las mismas rutas MAS LIMPIO
-router.route('/forgot-password/:token').get(checkToken).post(newPassword)
+router.route("/forgot-password/:token").get(checkToken).post(newPassword);
+
+router.get("/profile", checkAuth, profile)
 
 export default router;

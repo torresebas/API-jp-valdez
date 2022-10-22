@@ -2,7 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import dbConnect from "./config/db.js";
 import userRoutes from "./routes/usersRoutes.js";
-
+import projectRoutes from './routes/projectRoutes.js'
+import taskRoutes from './routes/taskRoutes.js'
 const app = express();
 app.use(express.json()); // Habilita JSON
 
@@ -12,6 +13,8 @@ dbConnect();
 
 //ROUTING
 app.use("/api/users", userRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/tasks", taskRoutes);
 
 const PORT = process.env.PORT || 4000;
 

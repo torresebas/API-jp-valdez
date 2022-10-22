@@ -1,5 +1,4 @@
 import express from "express";
-const router = express.Router();
 import {
   registerUser,
   authenticate,
@@ -12,6 +11,7 @@ import {
 
 import checkAuth from "../middlewares/checkAuth.js";
 
+const router = express.Router();
 // Register - Auth - Confirm-User
 router.post("/", registerUser); //Create a new user
 router.post("/login", authenticate); //Auth an user

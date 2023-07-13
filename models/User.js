@@ -35,6 +35,7 @@ userSchema.pre("save", async function (next) {
   //revisa que el password no haya sido cambiado
   // el pre save hashea sobre el hash actual -> el usuario perderia el aceso
   //si no se modifica el password lo deja quieto
+  //isModified es de mongo
   if (!this.isModified("password")) {
     next();
   }
@@ -44,8 +45,11 @@ userSchema.pre("save", async function (next) {
 
 //Comprobar Password
 //Funcion para comprobar el password de manera custom
-userSchema.methods.checkPassword = async function (passwordform) { // password que viene desde el form
+userSchema.methods.checkPassword = async function (passwordform) {
+  // password que viene desde el form
   return await bcrypt.compare(passwordform, this.password); // compara el que user escribe, contra el que existe hasheado
+  //Retorna true/false
+  //! con this tiene acceso al password que viene en userSchema
 };
 
 const User = mongoose.model("User", userSchema);

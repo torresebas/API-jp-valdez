@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import IdGenerator from "../helpers/IdGenerator.js";
 import JWTGenerate from "../helpers/JWTGenerator.js";
+import { emailRegister, emailForgotPassword } from "../helpers/email.js";
 
 //CREATION
 const registerUser = async (req, res) => {
@@ -16,8 +17,17 @@ const registerUser = async (req, res) => {
   try {
     const user = new User(req.body); // Viene (body-datos) del Formulario en el frontend
     user.token = IdGenerator();
-    const userSaved = await user.save();
-    res.json(userSaved);
+    // const userSaved = await user.save(); // Solo para recordar si quiero retornar el obj creado
+    await user.save();
+    //Enviar el email de confirmacion
+    emailRegister({
+      name: user.name,
+      email: user.email,
+      token: user.token,
+    });
+    res.json({
+      msg: "User Created Successfully, check your email",
+    });
   } catch (error) {
     console.log(error);
   }
@@ -49,7 +59,7 @@ const authenticate = async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
-      email: user.email,
+      email: user.email, //? depronto no almacenar email
       token: JWTGenerate(user._id),
     });
   } else {
@@ -89,6 +99,13 @@ const forgotPassword = async (req, res) => {
   try {
     user.token = IdGenerator();
     await user.save();
+
+    //ENVIA EL EMAIL DE RECUPERACION
+    emailForgotPassword({
+      name: user.name,
+      email: user.email,
+      token: user.token,
+    });
     res.json({ msg: `We've sent an email with the instructions` });
   } catch (error) {
     console.log(error);
@@ -103,7 +120,7 @@ const checkToken = async (req, res) => {
   if (tokenValid) {
     res.json({ msg: `Token Valido User Exist` });
   } else {
-    const error = new Error(`Token no valido`);
+    const error = new Error(`Invalid Token!!`);
     return res.status(404).json({ msg: error.message });
   }
 };
@@ -118,6 +135,7 @@ const newPassword = async (req, res) => {
   if (user) {
     user.password = password;
     user.token = "";
+    user.confirmUser = true;
     try {
       await user.save();
       res.json({ msg: "Password Changed!" });
@@ -125,15 +143,14 @@ const newPassword = async (req, res) => {
       console.log(error);
     }
   } else {
-    const error = new Error(`Token no valido`);
+    const error = new Error(`Invalid Token!!!`);
     return res.status(404).json({ msg: error.message });
   }
 };
 
 const profile = async (req, res) => {
   const { user } = req;
-  res.json(user)
-
+  res.json(user);
 };
 
 export {
